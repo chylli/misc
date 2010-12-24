@@ -1,0 +1,21 @@
+1. edit test.sh, then run it.
+
+2. you can visit backend status by :
+mysql -P5000 -h127.0.0.1 -uchylli -h123456 -e 'select * from backends'
+
+3. you must have dual-masters to get the result of failsafe.
+
+4. when master A down, then proxy will redirect all of write query to
+another master in 2 minutes ( 2 minutes is the proxy's limit, not
+mine)
+
+5. you should restart proxy after you fix A. Proxy will not use A
+again for writing reuqest again even if A come back. That's because we
+want to avoid sync problem.
+
+6. In the future I will add the function to select masters in the
+admin port, so we needn't restart proxy
+
+7. Maybe I should write a daemon to check mysql status and order proxy
+to switch master if need. And the daemon should switch other slave's
+master info.
