@@ -31,7 +31,7 @@ local commands    = require("proxy.commands")
 local tokenizer   = require("proxy.tokenizer")
 --local lb          = require("proxy.balance")
 local auto_config = require("proxy.auto-config")
-
+require("init")
 
 --- config
 --
@@ -44,12 +44,6 @@ if not proxy.global.config.rwsplit then
 	}
 end
 
-if not proxy.global.ever_up then
-   proxy.global.ever_up = {}
-	for i = 1, #proxy.global.backends do
-        proxy.global.ever_up[i] = true
-    end
-end
 
 ---
 -- read/write splitting sends all non-transactional SELECTs to the slaves
@@ -65,25 +59,22 @@ local is_in_select_calc_found_rows = false
 
 function idle_failsafe_rw()
 	local backend_ndx = 0
+   
+    -- if no master, reuturn 0, or if master not down, return master
+    if proxy.global.master == 0 or proxy.global.backends[proxy.global.master].state ~= proxy.BACKEND_STATE_DOWN then
+       return proxy.global.master
+    end
 
-
-	for i = 1, #proxy.global.backends do
+    -- master has down, we should choose a new master from other rw servers.
+	for i = proxy.global.master, #proxy.global.backends do
 		local s = proxy.global.backends[i]
 		local conns = s.pool.users[proxy.connection.client.username]
 
-        if s.state == proxy.BACKEND_STATE_DOWN then
-           proxy.global.ever_up[i] = false
+        if s.state ~= proxy.BACKEND_STATE_DOWN and s.type == proxy.BACKEND_TYPE_RW then
+           proxy.global.master = i
+           return proxy.global.master
         end
-
-		if conns.cur_idle_connections > 0 and 
-		   proxy.global.ever_up[i] and 
-		   s.type == proxy.BACKEND_TYPE_RW then
-			backend_ndx = i
-			break
-		end
 	end
-
-	return backend_ndx
 end
 
 

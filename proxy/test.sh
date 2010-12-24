@@ -2,6 +2,7 @@
 
 BASE_DIR=/home/chylli/study/misc/proxy
 BIN_DIR=${BASE_DIR}/mysql-proxy/bin
+export LUA_PATH="${BASE_DIR}/?.lua"
 
 ${BIN_DIR}/mysql-proxy \
 --proxy-lua-script=${BASE_DIR}/rw-splitting.lua \

@@ -18,6 +18,7 @@
 
  $%ENDLICENSE%$ --]]
 
+require("init")
 
 function set_error(errmsg) 
 	proxy.response = {
@@ -46,7 +47,7 @@ function read_query(packet)
 			  type = proxy.MYSQL_TYPE_STRING },
 			{ name = "state",
 			  type = proxy.MYSQL_TYPE_STRING },
-            { name = "ever_up",
+            { name = "master",
               type = proxy.MYSQL_TYPE_STRING },
 			{ name = "type",
 			  type = proxy.MYSQL_TYPE_STRING },
@@ -68,18 +69,42 @@ function read_query(packet)
 				"ro"
 			}
 			local b = proxy.global.backends[i]
+            local master;
+            if proxy.global.master == i then
+               master = "Yes"
+            else
+               master = "No"
+            end
+
 
 			rows[#rows + 1] = {
 				i,
 				b.dst.name,          -- configured backend address
 				states[b.state + 1], -- the C-id is pushed down starting at 0
-                tostring(proxy.global.ever_up[i]), -- is that backend never down ?
+                master,
 				types[b.type + 1],   -- the C-id is pushed down starting at 0
 				b.uuid,              -- the MySQL Server's UUID if it is managed
 				b.connected_clients  -- currently connected clients
 			}
-		end
-	elseif query:lower() == "select * from help" then
+         end
+     elseif string.find(query:lower(),"set master %d") then
+        local m = tonumber(string.sub(query:lower(),string.find(query:lower(),"%d")))
+        if m > #proxy.global.backends then
+           set_error("no such backend: " .. m)
+           return proxy.PROXY_SEND_RESULT
+        end
+        if proxy.global.backends[m].type ~= proxy.BACKEND_TYPE_RW then
+           set_error("backend " .. m .. " is not a rw backend")
+           return proxy.PROXY_SEND_RESULT
+        end
+        if proxy.global.backends[m].state == proxy.BACKEND_STATE_DOWN then
+           set_error("backend " .. m .. " is down")
+           return proxy.PROXY_SEND_RESULT
+        end
+        proxy.global.master = m
+        proxy.response.type = proxy.MYSQLD_PACKET_OK
+        return proxy.PROXY_SEND_RESULT
+     elseif query:lower() == "select * from help" then
 		fields = { 
 			{ name = "command", 
 			  type = proxy.MYSQL_TYPE_STRING },
@@ -88,7 +113,9 @@ function read_query(packet)
 		}
 		rows[#rows + 1] = { "SELECT * FROM help", "shows this help" }
 		rows[#rows + 1] = { "SELECT * FROM backends", "lists the backends and their state" }
-	else
+
+
+    else
 		set_error("use 'SELECT * FROM help' to see the supported commands")
 		return proxy.PROXY_SEND_RESULT
 	end
