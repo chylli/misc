@@ -1,6 +1,9 @@
+
 put mysql proxy 0.8.1 to some dir
 
- edit test.sh, then run it.
+edit test.sh, then run it.
+
+--proxy-backend-addresses should be ahead of --proxy-read-only-backend-addresses.
 
 you can visit backend status by :
 mysql -P5000 -h127.0.0.1 -uchylli -h123456 -e 'select * from backends'
