@@ -1,0 +1,16 @@
+Trying to connect to '#testmybot'
+DBD::mysql::st execute failed: MySQL server has gone away at /home/chylli/study/bot/bot.pl line 118.
+DBD::mysql::st execute failed: MySQL server has gone away at /home/chylli/study/bot/bot.pl line 118.
+DBD::mysql::st execute failed: MySQL server has gone away at /home/chylli/study/bot/bot.pl line 118.
+DBD::mysql::st execute failed: MySQL server has gone away at /home/chylli/study/bot/bot.pl line 172.
+DBD::mysql::st execute failed: MySQL server has gone away at /home/chylli/study/bot/bot.pl line 118.
+DBD::mysql::st execute failed: MySQL server has gone away at /home/chylli/study/bot/bot.pl line 118.
+DBD::mysql::st execute failed: MySQL server has gone away at /home/chylli/study/bot/bot.pl line 118.
+DBD::mysql::st execute failed: MySQL server has gone away at /home/chylli/study/bot/bot.pl line 118.
+DBD::mysql::st execute failed: MySQL server has gone away at /home/chylli/study/bot/bot.pl line 118.
+DBD::mysql::st execute failed: MySQL server has gone away at /home/chylli/study/bot/bot.pl line 118.
+DBD::mysql::st execute failed: MySQL server has gone away at /home/chylli/study/bot/bot.pl line 118.
+DBD::mysql::st execute failed: MySQL server has gone away at /home/chylli/study/bot/bot.pl line 118.
+Sun Dec  2 01:09:22 2012: info: restarting
+
+Trying to connect to '#testmybot'
